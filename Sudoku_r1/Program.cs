@@ -18,17 +18,40 @@ namespace Sudoku_r1
             MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        public async static void R1(string url)
+        public async static void R1(string html)
         {
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync(url);//Например https://grandgames.net/sudoku/id145319"
-            string html = await response.Content.ReadAsStringAsync();
-
-
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(html);
             string result = string.Empty;
-            var tables = doc.DocumentNode.SelectNodes("//table");
+            HtmlNodeCollection tables = doc.DocumentNode.SelectNodes("//table[@id='sudoku_mt']");
+
+            for(int i=0; i<9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    var el_i_j = doc.DocumentNode.SelectSingleNode("//td[@id='sc" +
+                    "" +
+                    i +
+                    "-" +
+                    j +
+                    "']").InnerText;
+
+                    Console.WriteLine(el_i_j);
+                }
+            }
+
+            
+
+            /*
+            string result111 = "Start";
+            foreach (HtmlNode t in tables)
+            {
+                result111 += t.InnerText + Environment.NewLine;
+            }
+            File.WriteAllText("ttt.html", result111);
+            */
+
+            return;
 
             //remove unnecessary-------------------
             tables.RemoveAt(0);
@@ -96,9 +119,8 @@ namespace Sudoku_r1
                 result += Environment.NewLine;//Console.WriteLine(); Console.WriteLine();
             }
 
-            string nameID = url.Split('d')[3];
+            string nameID = "0001";
             File.WriteAllText(nameID + ".txt", result);
-            client.Dispose();
         }
 
         public static Account account = new Account();
@@ -127,7 +149,7 @@ namespace Sudoku_r1
 
         async static Task MainAsync(string[] args)
         {
-            int readAccountResult = ReadAccount();
+            /*int readAccountResult = ReadAccount();
             if (readAccountResult == 0)
             {
                 ChromeBrowser b1 = new ChromeBrowser();
@@ -144,9 +166,21 @@ namespace Sudoku_r1
                 Thread.Sleep(1000);
                 b1.driver.Navigate().GoToUrl("http://www.grandgames.net/sudoku");
 
-                var tt = b1.driver.FindElement(By.ClassName("pages")).Text;
-            }
+                //var tt = b1.driver.FindElement(By.ClassName("pages")).Text;
+                b1.driver.Navigate().GoToUrl("https://grandgames.net/sudoku/id145221");
+                //Thread.Sleep(7500);
+                while (b1.driver.FindElements(By.ClassName("dsbut")).Count>0)
+                {
+                    Thread.Sleep(200);
+                }
+                b1.driver.FindElement(By.ClassName("prbut")).Click();
+                Thread.Sleep(3000);
 
+                R1(b1.driver.PageSource);//TUT
+            }*/
+
+            var tt=File.ReadAllText("tt1.html");
+            R1(tt);
 
             Console.ReadKey();
         }
@@ -155,6 +189,6 @@ namespace Sudoku_r1
 
 
 
-        //----------THE END
+//----------THE END
     }
 }
